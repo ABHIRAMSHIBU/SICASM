@@ -37,19 +37,19 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: SICASM
+all: SIC\ ASSEMBLER
 
 # Tool invocations
-SICASM: $(OBJS) $(USER_OBJS)
+SIC\ ASSEMBLER: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	g++  -o "SICASM" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++  -o "SIC ASSEMBLER" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(CC_DEPS)$(C++_DEPS)$(EXECUTABLES)$(C_UPPER_DEPS)$(CXX_DEPS)$(OBJS)$(CPP_DEPS)$(C_DEPS) SICASM
+	-$(RM) $(CC_DEPS)$(C++_DEPS)$(EXECUTABLES)$(C_UPPER_DEPS)$(CXX_DEPS)$(OBJS)$(CPP_DEPS)$(C_DEPS) "SIC ASSEMBLER"
 	-@echo ' '
 
 .PHONY: all clean dependents

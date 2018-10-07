@@ -74,12 +74,15 @@ public:
 	bool eof;
 	int location;
 	int line;
+	bool w;
 	fileHandler(string name,char operation){
 		if(operation=='r'){
 			f.open(name.c_str(),ios::in);
+			w=false;
 		}
 		if(operation=='w'){
 			f.open(name.c_str(),ios::out);
+			w=true;
 		}
 		eof=f.eof();
 		location=f.tellg();
