@@ -9,6 +9,7 @@
 #include<map>
 #include<functional>
 #include<fstream>
+#include <boost/algorithm/string/replace.hpp>
 using namespace std;
 typedef function<void(string,int)> fun;
 class Table{
@@ -142,6 +143,20 @@ public:
 		}
 	}
 };
+
+string strip(string line){
+	boost::replace_all(line,"\t"," ");
+	boost::replace_all(line,"\n","");
+	return line;
+}
+char *tocharArray(string line){
+	char *array=new char(line.length()+1);
+	for(int i=0;i<line.length();i++){
+		array[i]=line[i];
+	}
+	array[line.length()]='\0';
+	return array;
+}
 class processASM{
 	string fileName;
 public:
@@ -150,16 +165,37 @@ public:
 	}
 	static void process(processASM p){
 		fileHandler f(p.fileName,'r');
-		cout<<f.readLine();
+		fileHandler fi(p.fileName+"-Intermediate",'w');
+		while(!f.eof){
+			string line=f.readLine();
+			cout<<"Line is "<<line<<endl;
+			line=strip(line);
+			if(line==""){
+				continue;
+			}
+			line="f"+line+" f";
+			string label,operand,opcode;
+			label=string(strtok(tocharArray(line.c_str())," "));
+			boost::replace_all(label,"f","");
+			operand=strtok(NULL," ");
+			opcode=strtok(NULL," ");
+			boost::replace_all(opcode,"f","");
+			fi.write(operand+"\t"+opcode);
+//			cout<<"label - "<<label<<endl;
+//			cout<<"operand - "<<operand<<endl;
+//			cout<<"opcode - "<<opcode<<endl;
+		}
+		cout<<"Exited gracefully";
 	}
 };
 int main(int argc, char **argv) {
 	Table t;
 	t.init();
 	if(argc>1){
-		processASM p(argv[1]);
+		processASM p("/home/abhijith/CSE S5/SYSTEM SOFTWARE/SicTools/pgms/odd.asm");
 		processASM::process(p);
 	}
+
 }
 
 
