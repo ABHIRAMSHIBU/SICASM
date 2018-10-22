@@ -107,12 +107,14 @@ public:
 	}
 	void print(string data){
 		f.write(data.c_str(),data.length());
+		f.flush();  //Automatic flush not working for some reason.
 	}
 	void write(string data){
 		print(data);
 	}
 	void println(string data){
 		f.write((data+"\n").c_str(),(data+"\n").length());
+		f.flush(); //Automatic flush not working for some reason.
 	}
 	void writeln(string data){
 		println(data);
@@ -142,6 +144,14 @@ public:
 			readLine();
 		}
 	}
+	void close(){
+		f.close();
+	}
+	~fileHandler(){
+		cout<<"Destructor";
+//		f.flush();
+//		f.close();
+	}
 };
 
 string strip(string line){
@@ -151,7 +161,7 @@ string strip(string line){
 }
 char *tocharArray(string line){
 	char *array=new char(line.length()+1);
-	for(int i=0;i<line.length();i++){
+	for(int i=0;i<(int)line.length();i++){
 		array[i]=line[i];
 	}
 	array[line.length()]='\0';
@@ -168,8 +178,12 @@ public:
 		fileHandler fi(p.fileName+"-Intermediate",'w');
 		while(!f.eof){
 			string line=f.readLine();
+			std::size_t found = line.find(".");
+			if (found != string::npos) //Check if its a comment
+			    continue;
 			cout<<"Line is "<<line<<endl;
 			line=strip(line);
+			cout<<line<<endl;
 			if(line==""){
 				continue;
 			}
@@ -180,22 +194,20 @@ public:
 			operand=strtok(NULL," ");
 			opcode=strtok(NULL," ");
 			boost::replace_all(opcode,"f","");
-			fi.write(operand+"\t"+opcode);
+			fi.println(operand+"\t"+opcode);
 //			cout<<"label - "<<label<<endl;
 //			cout<<"operand - "<<operand<<endl;
 //			cout<<"opcode - "<<opcode<<endl;
 		}
 		cout<<"Exited gracefully";
+		fi.close();
 	}
 };
 int main(int argc, char **argv) {
 	Table t;
 	t.init();
-	if(argc>1){
-		processASM p("/home/abhijith/CSE S5/SYSTEM SOFTWARE/SicTools/pgms/odd.asm");
+	if(argc>0){
+		processASM p("/home/abhiram/asm/test.asm");
 		processASM::process(p);
 	}
-
 }
-
-
