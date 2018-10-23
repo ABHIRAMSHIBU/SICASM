@@ -36,7 +36,19 @@ public:
 		return pc;
 	}
 	static int BYTE(string oper){
-
+		if(oper.c_str()[0]=='C'){
+			cout<<"Abhiram Debug code:"<<oper.substr(1,oper.length()-1)<<endl;
+			return oper.length()-3;
+		}
+		else{
+			cout<<"Abhiram Debug code:"<<oper.substr(2,oper.length()-1)<<endl;
+			if(oper.length()%2!=0){
+				return (oper.length()+1)/2;
+			}
+			else{
+				return (oper.length())/2;
+			}
+		}
 	}
 	void init(){
 //		PSEUDOOPTAB["RESW"]=RESW;
