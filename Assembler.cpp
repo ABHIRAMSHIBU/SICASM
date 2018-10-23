@@ -40,16 +40,16 @@ public:
 	}
 	static int BYTE(string oper){
 		if(oper.c_str()[0]=='C'){
-			cout<<"Abhiram Debug code:"<<oper.substr(1,oper.length()-1)<<endl;
+			cout<<"Abhiram Debug code C:"<<oper.substr(1,oper.length()-2)<<endl;
 			return oper.length()-3;
 		}
 		else{
-			cout<<"Abhiram Debug code:"<<oper.substr(2,oper.length()-1)<<endl;
-			if(oper.length()%2!=0){
-				return (oper.length()+1)/2;
+			cout<<"Abhiram Debug code X:"<<oper.substr(2,oper.length()-2)<<endl;
+			if((oper.length()-3)%2!=0){
+				return (oper.length()-3+1)/2;
 			}
 			else{
-				return (oper.length())/2;
+				return (oper.length()-3)/2;
 			}
 		}
 	}
@@ -192,6 +192,7 @@ char *tocharArray(string line){
 	array[line.length()]='\0';
 	return array;
 }
+
 class processASM{
 	string fileName;
 public:
@@ -201,6 +202,8 @@ public:
 	static void process(processASM p){
 		fileHandler f(p.fileName,'r');
 		fileHandler fi(p.fileName+"-Intermediate",'w'); //fi = File Intermediate
+		fileHandler fst(p.fileName+"-Symbol Table",'w');//fst- File Symbol Table
+
 		int PC=0;
 		string hex_pc="";
 		bool start=true;
@@ -230,7 +233,6 @@ public:
 			boost::to_upper(operand);
 			boost::to_upper(opcode);
 			cout<<"Label:"<<label<<" opcode:"<<opcode<<" operand "<<operand<<endl;
-
 
 			if(start){
 				if(opcode=="START"){
@@ -272,7 +274,7 @@ public:
 //			cout<<"operand - "<<operand<<endl;
 //			cout<<"opcode - "<<opcode<<endl;
 		}
-		cout<<"Exited gracefully";
+		cout<<"Exited gracefully"<<endl;
 		fi.close();
 	}
 };
@@ -283,4 +285,6 @@ int main(int argc, char **argv) {
 		processASM p("add.asm");
 		processASM::process(p);
 	}
+	string n = Table().OPTAB["RESW"];
+
 }
