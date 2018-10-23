@@ -10,12 +10,13 @@
 #include<functional>
 #include<fstream>
 #include <boost/algorithm/string/replace.hpp>
+#include <sstream>
 using namespace std;
-typedef function<void(string,int)> fun;
+//typedef function<void(string,int)> fun;
 class Table{
 public:
 	map< string, string > OPTAB;
-	map< string, fun > PSEUDOOPTAB;
+//	map< string, fun > PSEUDOOPTAB;
 	static void RESW(string line, int number){
 		cout<<"TEST CODE"<<endl;
 	}
@@ -29,10 +30,10 @@ public:
 
 	}
 	void init(){
-		PSEUDOOPTAB["RESW"]=RESW;
-		PSEUDOOPTAB["WORD"]=WORD;
-		PSEUDOOPTAB["RESB"]=RESB;
-		PSEUDOOPTAB["BYTE"]=BYTE;
+//		PSEUDOOPTAB["RESW"]=RESW;
+//		PSEUDOOPTAB["WORD"]=WORD;
+//		PSEUDOOPTAB["RESB"]=RESB;
+//		PSEUDOOPTAB["BYTE"]=BYTE;
 		OPTAB["ADD"]="18";
 		OPTAB["AND"]="40";
 		OPTAB["COMP"]="28";
@@ -120,7 +121,7 @@ public:
 		println(data);
 	}
 	string front(){
-		return readLine();
+		return		 readLine();
 	}
 	string next(){
 		return readLine();
@@ -175,9 +176,11 @@ public:
 	}
 	static void process(processASM p){
 		fileHandler f(p.fileName,'r');
-		fileHandler fi(p.fileName+"-Intermediate",'w');
+		fileHandler fi(p.fileName+"-Intermediate",'w'); //fi = File Intermediate
+		int PC=0;
 		while(!f.eof){
 			string line=f.readLine();
+			cout<<f.line;
 			std::size_t found = line.find(".");
 			if (found != string::npos) //Check if its a comment
 			    continue;
@@ -195,6 +198,10 @@ public:
 			opcode=strtok(NULL," ");
 			boost::replace_all(opcode,"f","");
 			fi.println(operand+"\t"+opcode);
+			stringstream what;
+			what<< std::hex<<10;
+			cout<<what.str();
+
 //			cout<<"label - "<<label<<endl;
 //			cout<<"operand - "<<operand<<endl;
 //			cout<<"opcode - "<<opcode<<endl;
@@ -207,7 +214,7 @@ int main(int argc, char **argv) {
 	Table t;
 	t.init();
 	if(argc>0){
-		processASM p("/home/abhiram/asm/test.asm");
+		processASM p("/home/students/sicasm/add.asm");
 		processASM::process(p);
 	}
 }
