@@ -178,8 +178,11 @@ public:
 		fileHandler f(p.fileName,'r');
 		fileHandler fi(p.fileName+"-Intermediate",'w'); //fi = File Intermediate
 		int PC=0;
-		while(!f.eof){
+		while(true){
 			string line=f.readLine();
+			if(f.eof){
+				break;
+			}
 			cout<<f.line;
 			std::size_t found = line.find(".");
 			if (found != string::npos) //Check if its a comment
@@ -201,7 +204,6 @@ public:
 			stringstream what;
 			what<< std::hex<<10;
 			cout<<what.str();
-
 //			cout<<"label - "<<label<<endl;
 //			cout<<"operand - "<<operand<<endl;
 //			cout<<"opcode - "<<opcode<<endl;
@@ -214,7 +216,7 @@ int main(int argc, char **argv) {
 	Table t;
 	t.init();
 	if(argc>0){
-		processASM p("/home/students/sicasm/add.asm");
+		processASM p("add.asm");
 		processASM::process(p);
 	}
 }
