@@ -17,16 +17,25 @@ class Table{
 public:
 	map< string, string > OPTAB;
 //	map< string, fun > PSEUDOOPTAB;
-	static void RESW(string line, int number){
-		cout<<"TEST CODE"<<endl;
+	static int RESW(string oper){
+		stringstream temp;
+		temp<<oper;
+		int pc=0;
+		temp>>pc;
+		pc=3*pc;
+		return pc;
 	}
-	static void WORD(string line, int number){
-
+	static int WORD(string oper){
+		return 3;
 	}
-	static void RESB(string line, int number){
-
+	static int RESB(string oper){
+		stringstream temp;
+		temp<<oper;
+		int pc=0;
+		temp>>pc;
+		return pc;
 	}
-	static void BYTE(string line, int number){
+	static int BYTE(string oper){
 
 	}
 	void init(){
