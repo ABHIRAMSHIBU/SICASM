@@ -190,20 +190,20 @@ public:
 		fileHandler f(p.fileName,'r');
 		fileHandler fi(p.fileName+"-Intermediate",'w'); //fi = File Intermediate
 		int PC=0;
+		string hex_pc="";
 		bool start=true;
 		string pgm_name;
 		while(true){
+			stringstream hex_pc_ss;
 			string line=f.readLine();
 			if(f.eof){
 				break;
 			}
-			cout<<f.line;
 			std::size_t found = line.find(".");
 			if (found != string::npos) //Check if its a comment
 			    continue;
 			cout<<"Line is "<<line<<endl;
 			line=strip(line);
-			cout<<line<<endl;
 			if(line==""){
 				continue;
 			}
@@ -211,40 +211,49 @@ public:
 			string label,operand,opcode;
 			label=string(strtok(tocharArray(line.c_str())," "));
 			boost::replace_all(label,"f","");
-			operand=strtok(NULL," ");
 			opcode=strtok(NULL," ");
+			operand=strtok(NULL," ");
 			boost::replace_all(opcode,"f","");
 			boost::to_upper(label);
 			boost::to_upper(operand);
 			boost::to_upper(opcode);
+			cout<<"Label:"<<label<<" opcode:"<<opcode<<" operand "<<operand<<endl;
+
 
 			if(start){
-				if(operand=="START"){
-					stringstream(operand)>>PC;
+				if(opcode=="START"){
+					cout<<"IT HAS Started"<<endl;
+					stringstream temp;
+					temp<<hex<<operand;
+					temp>>PC;
+					cout<<"PC="<<PC<<endl;
+					fi.println(temp.str()+"\t"+opcode+"\t"+operand);
 					pgm_name=label;
 				}
 			}
+			else{
+				cout<<"PC="<<PC<<endl;
+				hex_pc_ss<<hex<<PC;
+				fi.println(hex_pc_ss.str()+"\t"+opcode+"\t"+operand);
+			}
 			start=false;
-			if(label=="RESW"){
-				PC+=RESW(operand);
+			if(opcode=="RESW"){
+				PC+=Table::RESW(operand);
 			}
-			else if(label=="RESB"){
-				PC+=RESB(operand);
+			else if(opcode=="RESB"){
+				PC+=Table::RESB(operand);
 			}
-			else if(label=="WORD"){
-				PC+=WORD(operand);
+			else if(opcode=="WORD"){
+				PC+=Table::WORD(operand);
 			}
-			else if(label=="BYTE"){
-				PC+=BYTE(operand);
+			else if(opcode=="BYTE"){
+				PC+=Table::BYTE(operand);
 			}
 			else{
 				PC+=3;
 			}
-			fi.println(operand+"\t"+opcode);
-			stringstream what;
-			what<< std::hex<<10;
-			string test;
-			what>>test;
+
+
 
 //			cout<<what.str();
 //			cout<<"label - "<<label<<endl;
