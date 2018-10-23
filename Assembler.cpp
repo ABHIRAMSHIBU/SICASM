@@ -11,11 +11,11 @@
 #include<fstream>
 #include <boost/algorithm/string/replace.hpp>
 using namespace std;
-typedef function<void(string,int)> fun;
+//typedef function<void(string,int)> fun;
 class Table{
 public:
 	map< string, string > OPTAB;
-	map< string, fun > PSEUDOOPTAB;
+//	map< string, fun > PSEUDOOPTAB;
 	static void RESW(string line, int number){
 		cout<<"TEST CODE"<<endl;
 	}
@@ -29,10 +29,10 @@ public:
 
 	}
 	void init(){
-		PSEUDOOPTAB["RESW"]=RESW;
-		PSEUDOOPTAB["WORD"]=WORD;
-		PSEUDOOPTAB["RESB"]=RESB;
-		PSEUDOOPTAB["BYTE"]=BYTE;
+//		PSEUDOOPTAB["RESW"]=RESW;
+//		PSEUDOOPTAB["WORD"]=WORD;
+//		PSEUDOOPTAB["RESB"]=RESB;
+//		PSEUDOOPTAB["BYTE"]=BYTE;
 		OPTAB["ADD"]="18";
 		OPTAB["AND"]="40";
 		OPTAB["COMP"]="28";
