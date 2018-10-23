@@ -9,7 +9,10 @@
 #include<map>
 #include<functional>
 #include<fstream>
-#include <boost/algorithm/string/replace.hpp>
+#include <string>
+//#include <boost/algorithm/string/replace.hpp>
+//#include<boost/algorithm/string/case_conv.hpp>
+#include <boost/algorithm/string.hpp>
 #include <sstream>
 using namespace std;
 //typedef function<void(string,int)> fun;
@@ -178,6 +181,8 @@ public:
 		fileHandler f(p.fileName,'r');
 		fileHandler fi(p.fileName+"-Intermediate",'w'); //fi = File Intermediate
 		int PC=0;
+		bool start=true;
+		string pgm_name;
 		while(true){
 			string line=f.readLine();
 			if(f.eof){
@@ -200,10 +205,39 @@ public:
 			operand=strtok(NULL," ");
 			opcode=strtok(NULL," ");
 			boost::replace_all(opcode,"f","");
+			boost::to_upper(label);
+			boost::to_upper(operand);
+			boost::to_upper(opcode);
+
+			if(start){
+				if(operand=="START"){
+					stringstream(operand)>>PC;
+					pgm_name=label;
+				}
+			}
+			start=false;
+			if(label=="RESW"){
+				PC+=RESW(operand);
+			}
+			else if(label=="RESB"){
+				PC+=RESB(operand);
+			}
+			else if(label=="WORD"){
+				PC+=WORD(operand);
+			}
+			else if(label=="BYTE"){
+				PC+=BYTE(operand);
+			}
+			else{
+				PC+=3;
+			}
 			fi.println(operand+"\t"+opcode);
 			stringstream what;
 			what<< std::hex<<10;
-			cout<<what.str();
+			string test;
+			what>>test;
+
+//			cout<<what.str();
 //			cout<<"label - "<<label<<endl;
 //			cout<<"operand - "<<operand<<endl;
 //			cout<<"opcode - "<<opcode<<endl;
