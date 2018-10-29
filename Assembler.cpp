@@ -15,6 +15,7 @@
 #include <boost/algorithm/string.hpp>
 #include <sstream>
 using namespace std;
+bool VERBOSE=false;
 //typedef function<void(string,int)> fun;
 class Table{
 public:
@@ -40,11 +41,13 @@ public:
 	}
 	static int BYTE(string oper){
 		if(oper.c_str()[0]=='C'){
-			cout<<"Abhiram Debug code C:"<<oper.substr(1,oper.length()-2)<<endl;
+			if(VERBOSE)
+				cout<<"Abhiram Debug code C:"<<oper.substr(1,oper.length()-2)<<endl;
 			return oper.length()-3;
 		}
 		else{
-			cout<<"Abhiram Debug code X:"<<oper.substr(2,oper.length()-2)<<endl;
+			if(VERBOSE)
+				cout<<"Abhiram Debug code X:"<<oper.substr(2,oper.length()-2)<<endl;
 			if((oper.length()-3)%2!=0){
 				return (oper.length()-3+1)/2;
 			}
@@ -173,7 +176,8 @@ public:
 		f.close();
 	}
 	~fileHandler(){
-		cout<<"Destructor";
+		if(VERBOSE)
+			cout<<"Destructor";
 //		f.flush();
 //		f.close();
 	}
@@ -192,22 +196,28 @@ char *tocharArray(string line){
 	array[line.length()]='\0';
 	return array;
 }
-
+map< string, string > SYMTAB;
 class processASM{
 	string fileName;
+
 public:
 	processASM(string fileName){
 		this->fileName=fileName;
 	}
-	static void process(processASM p){
+	static void process(processASM p,bool verbose){
+		VERBOSE=verbose;
+		string intermediate_file_name=p.fileName+"-Intermediate";
+		string symbol_table_file_name=p.fileName+"-Symbol_Table";
 		fileHandler f(p.fileName,'r');
-		fileHandler fi(p.fileName+"-Intermediate",'w'); //fi = File Intermediate
-		fileHandler fst(p.fileName+"-Symbol Table",'w');//fst- File Symbol Table
+		fileHandler fi(intermediate_file_name,'w'); //fi = File Intermediate
+		fileHandler fst(symbol_table_file_name,'w');//fst- File Symbol Table
 
 		int PC=0;
 		string hex_pc="";
 		bool start=true;
 		string pgm_name;
+		int starting_address=0;
+		int program_length;
 		while(true){
 			stringstream hex_pc_ss;
 			string line=f.readLine();
@@ -217,7 +227,8 @@ public:
 			std::size_t found = line.find(".");
 			if (found != string::npos) //Check if its a comment
 			    continue;
-			cout<<"Line is "<<line<<endl;
+			if(verbose)
+					cout<<"Line is "<<line<<endl;
 			line=strip(line);
 			if(line==""){
 				continue;
@@ -232,41 +243,57 @@ public:
 			boost::to_upper(label);
 			boost::to_upper(operand);
 			boost::to_upper(opcode);
-			cout<<"Label:"<<label<<" opcode:"<<opcode<<" operand "<<operand<<endl;
+			if(verbose)
+				cout<<"Label:"<<label<<" opcode:"<<opcode<<" operand "<<operand<<endl;
 
-			if(start){
+			if(start){//checking for the START label
 				if(opcode=="START"){
-					cout<<"IT HAS Started"<<endl;
+					if(verbose)
+						cout<<"START LABEL IDENTIFIED"<<endl;
 					stringstream temp;
 					temp<<hex<<operand;
 					temp>>PC;
-					cout<<"PC="<<PC<<endl;
+					if(verbose)
+						cout<<"PC="<<PC<<endl;
 					fi.println(temp.str()+"\t"+opcode+"\t"+operand);
 					pgm_name=label;
+					starting_address=PC;
 				}
 			}
-			else{
-				cout<<"PC="<<PC<<endl;
+			else{ //if not 'START' write to intermediate file the split line with the current PC value
+				if(verbose)
+					cout<<"PC="<<PC<<endl;
 				hex_pc_ss<<hex<<PC;
 				fi.println(hex_pc_ss.str()+"\t"+opcode+"\t"+operand);
 			}
-			start=false;
-			if(opcode=="RESW"){
-				PC+=Table::RESW(operand);
-			}
-			else if(opcode=="RESB"){
-				PC+=Table::RESB(operand);
-			}
-			else if(opcode=="WORD"){
-				PC+=Table::WORD(operand);
-			}
-			else if(opcode=="BYTE"){
-				PC+=Table::BYTE(operand);
-			}
-			else{
-				PC+=3;
+			//code to create SYMBTAB
+			if(label=="" && verbose){
+				cout<<"NO LABEL HERE"<<endl;
 			}
 
+			if(SYMTAB.find(label)==SYMTAB.end() && label!="" && !start ){
+				SYMTAB[label]=PC;
+				fst.println(label+"\t"+hex_pc_ss.str());
+			}
+
+			if(!start){
+				if(opcode=="RESW"){
+					PC+=Table::RESW(operand);
+				}
+				else if(opcode=="RESB"){
+					PC+=Table::RESB(operand);
+				}
+				else if(opcode=="WORD"){
+					PC+=Table::WORD(operand);
+				}
+				else if(opcode=="BYTE"){
+					PC+=Table::BYTE(operand);
+				}
+				else{
+					PC+=3;
+				}
+			}
+			start=false;
 
 
 //			cout<<what.str();
@@ -274,17 +301,26 @@ public:
 //			cout<<"operand - "<<operand<<endl;
 //			cout<<"opcode - "<<opcode<<endl;
 		}
-		cout<<"Exited gracefully"<<endl;
+		//converting length of the program into hex
+		program_length=PC-starting_address-3;
+		stringstream hex_program_length;
+		hex_program_length<<hex<<program_length;
+
+		cout<<"Length of the Assembly program in hex is "<<hex_program_length.str()<<endl;
 		fi.close();
 	}
 };
 int main(int argc, char **argv) {
 	Table t;
 	t.init();
-	if(argc>0){
+	if(argc==1){
 		processASM p("add.asm");
-		processASM::process(p);
+		processASM::process(p,false);
 	}
-	string n = Table().OPTAB["RESW"];
+	if(argc==2){
+		processASM p(argv[1]);
+		processASM::process(p,false);
+	}
+
 
 }
